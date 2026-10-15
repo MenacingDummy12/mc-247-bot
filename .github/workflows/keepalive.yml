@@ -2,8 +2,8 @@ name: 24-7 Minecraft Host Keeper
 on:
   push:
   schedule:
-    - cron: '0 */4 * * *' # Auto-triggers a fresh runner every 4 hours to bypass timeouts
-  workflow_dispatch:      # Allows you to press a manual "Start" button
+    - cron: '0 */4 * * *' 
+  workflow_dispatch:      
 
 jobs:
   run-bot:
@@ -18,7 +18,7 @@ jobs:
           node-version: 20
 
       - name: Install Mineflayer Connection Driver
-        run: npm install mineflayer
+        run: npm install mineflayer mineflayer-pathfinder express
 
       - name: Execute Bot Keepalive Loop
         run: node index.js
