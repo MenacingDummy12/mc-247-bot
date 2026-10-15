@@ -1,25 +1,29 @@
 const mineflayer = require('mineflayer');
 
-// CRUCIAL FIX: Catch packet parsing errors globally to prevent the script from crashing
 process.on('uncaughtException', (err) => {
+  // Gracefully drop complex item/registry parsing packets so the script never crashes
   if (err.message.includes('PartialReadError') || err.message.includes('Read error')) {
-    console.log(`[Parser Warning] Ignored a broken server packet: ${err.message}`);
-  } else {
-    console.error('System encountered an unhandled error:', err);
-    process.exit(1);
+    return;
   }
+  console.error('Unhandled script system error:', err);
+  process.exit(1);
 });
 
 const botOptions = {
   host: 'ffaseerver.mcsh.io',
   port: 25565,
-  username: 'HostKeeperBot',
+  username: 'CloudGuard_7', // Make sure this doesn't conflict with your other bot!
   version: '1.21.1',
-  hideErrors: true // Tells mineflayer to suppress internal protocol errors
+  hideErrors: true,
+  checkTimeoutInterval: 60 * 1000 // Prevents premature socket drop-offs
 };
 
 console.log('Connecting bot to Minecraft server via GitHub Actions...');
 const bot = mineflayer.createBot(botOptions);
+
+// FIX 1: Turn off default heavy world physics parsing. 
+// This keeps the bot perfectly anchored on the map without lagging the connection.
+bot.physicsEnabled = false; 
 
 bot.on('login', () => {
   console.log('Success: Bot logged into the server!');
@@ -27,33 +31,34 @@ bot.on('login', () => {
   if (bot._client) {
     bot._client.write('settings', {
       locale: 'en_US',
-      viewDistance: 4, // Drop view distance to minimize packet load size
+      viewDistance: 2, // Minimal view distance reduces heavy chunk network packets
       chatFlags: 0,
       chatColors: true,
-      skinParts: 127,
+      skinParts: 0,
       mainHand: 1,
       enableTextFiltering: false,
       allowServerListings: true
     });
-    console.log('Client configuration packets successfully injected.');
   }
 });
 
 bot.on('spawn', () => {
   console.log('Bot successfully spawned into the world grid!');
+  
+  // FIX 2: Gentle jump loop to send constant traffic packets without triggering anti-cheats
   setInterval(() => {
     if (bot && bot.entity) {
       bot.setControlState('jump', true);
-      setTimeout(() => bot.setControlState('jump', false), 500);
+      setTimeout(() => bot.setControlState('jump', false), 200);
     }
-  }, 30000); 
+  }, 15000); 
 });
 
 bot.on('end', (reason) => {
-  console.log(`Disconnected (Reason: ${reason}). Resetting cloud workflow thread loop...`);
+  console.log(`Disconnected (Reason: ${reason}). Resetting cloud runner loop...`);
   process.exit(0); 
 });
 
 bot.on('error', (err) => {
-  console.log(`Connection network exception handled: ${err.message}`);
+  console.log(`Network connection exception handled: ${err.message}`);
 });
