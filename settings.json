@@ -3,9 +3,11 @@
   "server": {
     "ip": "ffaseerver.mcsh.io",
     "port": 25565,
-    "version": "1.21.1"
+    "version": ""
   },
   "auth": {
-    "username": "CloudGuard_7"
-  }
+    "username": "KeepAlive_Bot9"
+  },
+  "antiAfk": true,
+  "debug": false
 }
