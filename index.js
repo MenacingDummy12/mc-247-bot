@@ -14,7 +14,7 @@ const botOptions = {
   host: 'ffaseerver.mcsh.io',
   port: 25565,
   username: 'HostKeeperBot',
-  version: '1.21.11',
+  version: '1.21.1',
   hideErrors: true // Tells mineflayer to suppress internal protocol errors
 };
 
